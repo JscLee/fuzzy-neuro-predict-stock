@@ -15,17 +15,17 @@ def cal_cor():
     input= open('raw_data.pkl', 'rb')
     df=pickle.load(input)   
     data=np.matrix(df)
-    data=(data.T)[1:,lag:-1]
-    rate=df.as_matrix(['ReturnRate'])[lag+1:]
+    data=(data.T)[1:,:-1]
+    rate=df.as_matrix(['ReturnRate'])[1:]
     #filter cor
     a=[]
     for i in xrange(data.shape[0]):
         cor.append(np.corrcoef(rate.T,data[i])[0][1])
         if abs(cor[i])<0.03:
             a.append(i)
-            print index[i]+':'+str(cor[i])
+            print 'del:'+index[i]+':'+str(cor[i])
         else:
-            print index[i]+':'+str(cor[i])
+            print 'keep:----'+index[i]+':'+str(cor[i])+'----'
     data=np.delete(data,a,axis=0)
     #delete filtered features in data
     a.reverse()
@@ -56,7 +56,7 @@ def cal_cor():
             figure()
             plot(pack['data'].tolist()[i],label=pack['index'][i])
             legend(loc='upper left')
-            savefig('C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170320\\1\\'+pack['index'][i]+'.png',dpi=200)
+            savefig('C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170320\\1\\'+pack['index'][i]+'_raw.png',dpi=200)
        
 
 def get_data():
@@ -73,8 +73,9 @@ def get_data():
     #alpha#6 lag=10
     df.insert(7,'alpha#6',df['open'])
     for i in xrange(10,len(df.index)):
-        df['alpha#6'][i]=np.corrcoef(df['alpha#6'][i-10:i],df['volume'][i-10:i])[0][1]
+        df['alpha#6'][i]=np.corrcoef(df['open'][i-10:i],df['volume'][i-10:i])[0][1]
 
+    
     #alpha#23 lag=20
     df.insert(8,'alpha#23',df['high'])   
     #过去20天最高价的均值
@@ -100,19 +101,35 @@ def get_data():
     temp=0
     for i in xrange(5,len(df.index)):
         df['alpha#28'][i]=np.corrcoef(df['v_ma20'][i-5:i],df['low'][i-5:i])[0][1]+(df['high'][i]+df['low'][i])/2.0-df['close'][i]
-        temp=temp+abs(df['alpha#28'][i])
-    for i in xrange(5,len(df.index)):
+
+    temp=abs(df['alpha#28'][20:]).sum()
+    for i in xrange(lag,len(df.index)):
         df['alpha#28'][i]=df['alpha#28'][i]/temp
-    
+
+
+
     #alpha#54 lag=0
     df.insert(10,'alpha#54',df['high'])  
     for i in xrange(len(df.index)):
-        df['alpha#54'][i]=(-1*(df['low'][i]-df['close'][i])*pow(df['open'][i],5))/(-1*(df['low'][i]-df['high'][i])*pow(df['close'][i],5))
-        
+        df['alpha#54'][i]=(-1*(df['low'][i]-df['close'][i])*pow(df['open'][i],5))/((df['low'][i]-df['high'][i])*pow(df['close'][i],5))
+
     #alpha#101 lag=0
     df.insert(11,'alpha#101',df['high'])  
     for i in xrange(len(df.index)):
         df['alpha#101'][i]=(df['close'][i]-df['open'][i])/(df['high'][i]-df['low'][i]+0.001) 
+        
+
+    df=df[lag:]
+    
+    #绘图
+    if True:
+        plot(df['alpha#6'],label='alpha#6')
+        #plot(df['alpha#23'],label='alpha#23')
+        plot(df['alpha#28'],label='alpha#28')
+        plot(df['alpha#54'],label='alpha#54')
+        plot(df['alpha#101'],label='alpha#101')
+        legend(loc='upper left')
+        show()
     
     df=df.drop(['price_change'],axis=1)       
     output = open('raw_data.pkl', 'wb')

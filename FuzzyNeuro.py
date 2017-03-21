@@ -5,6 +5,7 @@ from theano import function
 import numpy as np
 import pickle
 from random import random
+from matplotlib.pyplot import *
 
 def layout_1(inputs,outputs):
     #2层网络(隐含层)
@@ -15,15 +16,14 @@ def layout_1(inputs,outputs):
     w4 = theano.shared(np.array([random(),random(),random(),random(),random(),random()]))
     w5 = theano.shared(np.array([random(),random(),random(),random(),random(),random()]))
     w6 = theano.shared(np.array([random(),random(),random(),random(),random(),random()]))
-    b1 = theano.shared(1.)
-    b2 = theano.shared(1.)
-    learning_rate = 0.000005
+    b1 = theano.shared(0.01)
+    b2 = theano.shared(0.01)
+    learning_rate = 0.0000005
     
 
     print 'Init network'
     a1 = 1/(1+T.exp(-T.dot(x,w1)-b1))
-    a2 = 1/(1+T.exp(-T.dot(x
-,w2)-b1))
+    a2 = 1/(1+T.exp(-T.dot(x,w2)-b1))
     a3 = 1/(1+T.exp(-T.dot(x,w3)-b1))
     a4 = 1/(1+T.exp(-T.dot(x,w4)-b1))
     a5 = 1/(1+T.exp(-T.dot(x,w5)-b1))
@@ -57,6 +57,7 @@ def layout_1(inputs,outputs):
         pred, cost_iter = train(inputs, outputs)
         print '###Iter: '+str(iteration)+'  cost: '+str(cost_iter)+' ###'
         cost.append(cost_iter)
+
     # 打印输出    
     print 'The outputs of the NN are:'
     for i in range(len(inputs)):
@@ -83,18 +84,19 @@ def layout_1(inputs,outputs):
 
     # 绘制损失图:
     print '\nThe flow of cost during model run is as following:'
-    import matplotlib.pyplot as plt
     #matplotlib inline
-    plt.figure(1)
-    plt.title('Variation of Cost')
-    plt.plot(cost)
+    figure(1)
+    title('Variation of Cost')
+    plot(cost)
+    savefig('C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170320\\1\\cost.png',dpi=200)
 
-    plt.figure(2)
-    plt.title('Prediction and Expectation')
-    plt.plot(pred)
-    plt.plot(result)
-    plt.show()
-        
+    figure(2)
+    title('Prediction and Expectation')
+    plot(pred)
+    plot(result)
+    show()
+    savefig('C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170320\\1\\prediction.png',dpi=200)
+
         
 
 input=open('1day_matrix.pkl','rb')
