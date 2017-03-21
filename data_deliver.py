@@ -1,3 +1,4 @@
+# -*- coding:utf-8 -*-
 import tushare as ts
 import pandas as pd
 import numpy as np
@@ -15,7 +16,7 @@ def cal_cor():
     data=np.matrix(df)
     data=(data.T)[1:,lag:-1]
     rate=df.as_matrix(['ReturnRate'])[lag+1:]
-    #过滤cor
+    #filter cor
     a=[]
     for i in xrange(data.shape[0]):
         cor.append(np.corrcoef(rate.T,data[i])[0][1])
@@ -25,16 +26,18 @@ def cal_cor():
         else:
             print index[i]+':'+str(cor[i])
     data=np.delete(data,a,axis=0)
-    #删去index中被过滤的
+    #delete filtered features in data
     a.reverse()
     index_cor=copy(index)
     for i in a:
         index_cor.pop(i)
 
     output=open('filter_cor.pkl','wb')
-    pickle.dump(rate,output)
-    pickle.dump(data,output)
-    pickle.dump(index_cor,output)
+    pack={}
+    pack['result']=rate
+    pack['data']=data
+    pack['index']=index_cor
+    pickle.dump(pack,output)
     output.close()
 
 def get_data():
@@ -55,7 +58,7 @@ def get_data():
 
     #alpha#23 lag=20
     df.insert(8,'alpha#23',df['high'])   
-        #过去20天平均日内最高价
+        #过去20天最高价
     df['alpha#23'][20]=df['high'][:20].sum()/20.0   
     get_larger=lambda x,y:x if x>y else y
     for i in xrange(21,len(df.index)):
@@ -92,6 +95,6 @@ def get_data():
     pickle.dump(index,output)
     output.close()
 
-#执行开始
+
 get_data()
 cal_cor()
