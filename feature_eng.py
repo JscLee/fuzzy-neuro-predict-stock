@@ -17,7 +17,7 @@ def normalize(index,data):
         avg_=data[i].mean()
         min_=data[i].min()
         max_=data[i].max()
-        data[i]=(data[i]-avg_)/(max_-min_)
+        data[i]=(data[i]-min_)/(max_-min_)
     return data
 pack=read_data()
 figure(1)
