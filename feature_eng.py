@@ -25,10 +25,18 @@ plot(pack['result'].T.tolist()[0])
 data=np.matrix([])
 data=normalize(pack['index'],pack['data'])
 result=normalize(pack['index'],pack['result'].T)
-#Data:matrix, rows:features, columns: dates
+#Data:matrix: index by features rows:features, columns: dates
+#pack['data']:index by examples
 pack['data']=data.T.tolist()
 pack['result']=result.tolist()[0]
-plot(pack['result'])
-show()
+
+#绘图
+if True:
+    for i in xrange(len(pack['index'])):
+        plot(data.tolist()[i],label=pack['index'][i])
+    plot(pack['result'],label='result')
+    legend(loc='upper left')
+    savefig('C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170320\\1\\feature.png',dpi=200)
+
 output=open('1day_matrix.pkl','wb')
 pickle.dump(pack,output)

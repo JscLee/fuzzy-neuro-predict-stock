@@ -5,6 +5,7 @@ import numpy as np
 import pickle
 from copy import copy
 from pandas import DataFrame,Series
+from matplotlib.pyplot import *
 index=['open','close','high','low','volume','v_ma20','alpha#6','alpha#23','alpha#28','alpha#54','alpha#101']
 lag=20
 
@@ -37,8 +38,26 @@ def cal_cor():
     pack['result']=rate
     pack['data']=data
     pack['index']=index_cor
+ 
     pickle.dump(pack,output)
     output.close()
+
+    #绘图
+    if True:
+        fig=figure()
+        #六个特征同时
+        for i in xrange(len(pack['index'])):
+            plot(pack['data'].tolist()[i],label=pack['index'][i])
+        plot(pack['result'].T.tolist()[0],linewidth=2.5,label='result')
+        legend(loc='upper left')
+        savefig('C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170320\\1\\raw_data.png',dpi=200)
+        #分别描绘六个特征
+        for i in xrange(len(pack['index'])):
+            figure()
+            plot(pack['data'].tolist()[i],label=pack['index'][i])
+            legend(loc='upper left')
+            savefig('C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170320\\1\\'+pack['index'][i]+'.png',dpi=200)
+       
 
 def get_data():
     df=DataFrame()
@@ -58,17 +77,24 @@ def get_data():
 
     #alpha#23 lag=20
     df.insert(8,'alpha#23',df['high'])   
-        #过去20天最高价
-    df['alpha#23'][20]=df['high'][:20].sum()/20.0   
-    get_larger=lambda x,y:x if x>y else y
+    #过去20天最高价的均值
+    df['alpha#23'][20]=df['high'][:20].sum()/20.0  
     for i in xrange(21,len(df.index)):
-        df['alpha#23'][i]=(20*df['alpha#23'][i-1]-df['alpha#23'][i-21]+df['alpha#23'][i-1])/20.0
+        df['alpha#23'][i]=(20*df['alpha#23'][i-1]-df['high'][i-21]+df['high'][i-1])/20.0
+    '''
+    plot(df['alpha#23'],df['date'],label='20_high_avg')
+    plot(df['high'],df['date'],label='high')
+    '''
     for i in xrange(20,len(df.index)):
-        if df['high'][i]>df['alpha#23'][i]:
-            df['alpha#23'][i]=-1*(df['alpha#23'][i-2]-df['high'][i])
+        if df['high'][i]>df['alpha#23'][i]: #今日高于过去20天平均，呈上涨趋势
+            df['alpha#23'][i]=-1*(df['high'][i-2]-df['high'][i])
         else:
             df['alpha#23'][i]=0
-
+    '''
+    plot(df['alpha#23'],df['date'],label='alpha#23')
+    legend(loc='upper left')
+    show()
+    '''
     #alpha#28 lag=5
     df.insert(9,'alpha#28',df['high'])   
     temp=0
@@ -89,11 +115,12 @@ def get_data():
         df['alpha#101'][i]=(df['close'][i]-df['open'][i])/(df['high'][i]-df['low'][i]+0.001) 
     
     df=df.drop(['price_change'],axis=1)       
-        
     output = open('raw_data.pkl', 'wb')
     pickle.dump(df,output)
     pickle.dump(index,output)
     output.close()
+
+
 
 
 get_data()
