@@ -36,14 +36,14 @@ if True:
         plot(data.tolist()[i],label=pack['index'][i])
     plot(pack['result'],label='result')
     legend(loc='upper left')
-    savefig('C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170320\\1\\feature.png',dpi=200)
+    savefig('C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170320\\2\\feature.png',dpi=200)
 
     for i in xrange(len(pack['index'])):
         figure()
         plot(data.tolist()[i],label=pack['index'][i])
         plot(pack['result'],label='result')
         legend(loc='upper left')
-        savefig('C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170320\\1\\'+pack['index'][i]+'.png',dpi=200)
+        savefig('C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170320\\2\\'+pack['index'][i]+'.png',dpi=200)
 
 output=open('1day_matrix.pkl','wb')
 pickle.dump(pack,output)

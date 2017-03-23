@@ -16,9 +16,9 @@ def layout_1(inputs,outputs):
     w4 = theano.shared(np.array([random(),random(),random(),random(),random(),random()]))
     w5 = theano.shared(np.array([random(),random(),random(),random(),random(),random()]))
     w6 = theano.shared(np.array([random(),random(),random(),random(),random(),random()]))
-    b1 = theano.shared(0.01)
-    b2 = theano.shared(0.01)
-    learning_rate = 0.0000005
+    b1 = theano.shared(1.)
+    b2 = theano.shared(1.)
+    learning_rate = 0.01
     
 
     print 'Init network'
@@ -53,7 +53,7 @@ def layout_1(inputs,outputs):
     print 'Start Training'
     # 遍历输入并计算输出:
     cost = []
-    for iteration in range(30000):
+    for iteration in range(300000):
         pred, cost_iter = train(inputs, outputs)
         print '###Iter: '+str(iteration)+'  cost: '+str(cost_iter)+' ###'
         cost.append(cost_iter)
@@ -65,7 +65,7 @@ def layout_1(inputs,outputs):
 
 
     #存储
-    output=open('C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170320\\1\\1.pkl','wb')
+    output=open('C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170320\\2\\2.pkl','wb')
     temp={}
     temp['pred']=pred
     temp['expec']=outputs
@@ -88,14 +88,16 @@ def layout_1(inputs,outputs):
     figure(1)
     title('Variation of Cost')
     plot(cost)
-    savefig('C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170320\\1\\cost.png',dpi=200)
+    legend(loc='upper left')
+    savefig('C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170320\\2\\cost.png')
 
     figure(2)
     title('Prediction and Expectation')
-    plot(pred)
-    plot(result)
+    plot(pred,label='p')
+    plot(result,label='e')
+    legend(loc='upper left')
+    savefig('C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170320\\2\\prediction.png')
     show()
-    savefig('C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170320\\1\\prediction.png',dpi=200)
 
         
 
