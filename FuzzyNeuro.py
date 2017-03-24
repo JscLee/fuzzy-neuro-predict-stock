@@ -4,57 +4,63 @@ import theano.tensor as T
 from theano import function
 import numpy as np
 import pickle
+from copy import copy
 from random import random
 from matplotlib.pyplot import *
+theano.config.compute_test_value = 'warn'
+from theano.printing import Print
 
 def layout_1(inputs,outputs):
-    #2层网络(隐含层)
+    #2初始化网络(2层隐含层)
     x = T.matrix('x')
-    w1 = theano.shared(np.array([random(),random(),random(),random(),random(),random()]))
-    w2 = theano.shared(np.array([random(),random(),random(),random(),random(),random()]))
-    w3 = theano.shared(np.array([random(),random(),random(),random(),random(),random()]))
-    w4 = theano.shared(np.array([random(),random(),random(),random(),random(),random()]))
-    w5 = theano.shared(np.array([random(),random(),random(),random(),random(),random()]))
-    w6 = theano.shared(np.array([random(),random(),random(),random(),random(),random()]))
+    w1=theano.shared(np.array(np.random.rand(6,6), dtype=theano.config.floatX))
+    w2=theano.shared(np.array(np.random.rand(6,6), dtype=theano.config.floatX))
+    w3=theano.shared(np.array(np.random.rand(6,1), dtype=theano.config.floatX))
+
     b1 = theano.shared(1.)
     b2 = theano.shared(1.)
+    b3 = theano.shared(1.)
     learning_rate = 0.01
     
 
+    #构造四层全连接网络
     print 'Init network'
-    a1 = 1/(1+T.exp(-T.dot(x,w1)-b1))
-    a2 = 1/(1+T.exp(-T.dot(x,w2)-b1))
-    a3 = 1/(1+T.exp(-T.dot(x,w3)-b1))
-    a4 = 1/(1+T.exp(-T.dot(x,w4)-b1))
-    a5 = 1/(1+T.exp(-T.dot(x,w5)-b1))
-    a6 = 1/(1+T.exp(-T.dot(x,w6)-b1))
-    x2 = T.stack([a1,a2,a3,a4,a5,a6],axis=1)
-    a7 = 1/(1+T.exp(-T.dot(x2,w3)-b2))    
+    a1=1/(1+T.exp(-T.dot(x,w1)-b1))
+    a2=1/(1+T.exp(-T.dot(a1,w2)-b2))
+    
+    #tmp=copy(a2)
+    #tmp.extend(a1)
+    #x2 = T.stack(tmp,axis=1)
+    a3 = 1/(1+T.exp(-T.dot(a2,w3)-b3))    
 
     a_hat = T.vector('a_hat') #Actual output
-    cost = -(a_hat*T.log(a7) + (1-a_hat)*T.log(1-a7)).sum()
-    dw1,dw2,dw3,dw4,dw5,dw6,db1,db2 = T.grad(cost,[w1,w2,w3,w4,w5,w6,b1,b2])
 
+    cost = T.sum((a_hat - a3)**2)
+    
+
+    dw1,dw2,dw3,db1,db2,db3=T.grad(cost,[w1,w2,w3,b1,b2,b3])
+
+    #定义学习规则
+    u_list=[]
+    u_list.append([w1,w1-learning_rate*dw1])
+    u_list.append([w2,w2-learning_rate*dw2])
+    u_list.append([w3,w3-learning_rate*dw3])
+    u_list.append([b1,b1-learning_rate*db1])
+    u_list.append([b2,b2-learning_rate*db2])
+    u_list.append([b3,b3-learning_rate*db3])
+    #训练函数
     train = function(
         inputs = [x,a_hat],
-        outputs = [a3,cost],
-        updates = [
-            [w1, w1-learning_rate*dw1],
-            [w2, w2-learning_rate*dw2],
-            [w3, w3-learning_rate*dw3],
-            [w4, w1-learning_rate*dw4],
-            [w5, w2-learning_rate*dw5],
-            [w6, w3-learning_rate*dw6],
-            [b1, b1-learning_rate*db1],
-            [b2, b2-learning_rate*db2]
-        ]
+        outputs = [a2[0],a3,cost],
+        updates = u_list
+        #profile=True
     )
 
     print 'Start Training'
     # 遍历输入并计算输出:
     cost = []
     for iteration in range(300000):
-        pred, cost_iter = train(inputs, outputs)
+        _pre,pred, cost_iter = train(inputs, outputs)
         print '###Iter: '+str(iteration)+'  cost: '+str(cost_iter)+' ###'
         cost.append(cost_iter)
 
@@ -65,7 +71,7 @@ def layout_1(inputs,outputs):
 
 
     #存储
-    output=open('C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170320\\2\\2.pkl','wb')
+    output=open('C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170323\\1\\1.pkl','wb')
     temp={}
     temp['pred']=pred
     temp['expec']=outputs
@@ -89,14 +95,14 @@ def layout_1(inputs,outputs):
     title('Variation of Cost')
     plot(cost)
     legend(loc='upper left')
-    savefig('C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170320\\2\\cost.png')
+    savefig('C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170323\\1\\cost.png')
 
     figure(2)
     title('Prediction and Expectation')
     plot(pred,label='p')
     plot(result,label='e')
     legend(loc='upper left')
-    savefig('C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170320\\2\\prediction.png')
+    savefig('C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170323\\1\\prediction.png')
     show()
 
         
