@@ -32,7 +32,7 @@
     <Compile Include="script.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="test.py">
+    <Compile Include="Readfrom Result.py">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

@@ -28,7 +28,7 @@ result=normalize(pack['index'],pack['result'].T)
 #Data:matrix: index by features rows:features, columns: dates
 #pack['data']:index by examples
 pack['data']=data.T.tolist()
-pack['result']=result.tolist()[0]
+pack['result']=result.T.tolist()
 
 #绘图
 if True:

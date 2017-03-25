@@ -8,34 +8,49 @@ from copy import copy
 from random import random
 from matplotlib.pyplot import *
 theano.config.compute_test_value = 'warn'
-from theano.printing import Print
+#from theano.printing import Print
 
 def layout_1(inputs,outputs):
     #2初始化网络(2层隐含层)
     x = T.matrix('x')
+    x.tag.test_value=np.matrix(np.ones([6,6]),dtype=theano.config.floatX)
+
     w1=theano.shared(np.array(np.random.rand(6,6), dtype=theano.config.floatX))
+    w1.tag.test_value=np.matrix(np.ones([6,6]),dtype=theano.config.floatX)
     w2=theano.shared(np.array(np.random.rand(6,6), dtype=theano.config.floatX))
     w3=theano.shared(np.array(np.random.rand(6,1), dtype=theano.config.floatX))
+
 
     b1 = theano.shared(1.)
     b2 = theano.shared(1.)
     b3 = theano.shared(1.)
-    learning_rate = 0.01
+    learning_rate = 0.02
     
 
     #构造四层全连接网络
     print 'Init network'
     a1=1/(1+T.exp(-T.dot(x,w1)-b1))
+
     a2=1/(1+T.exp(-T.dot(a1,w2)-b2))
     
     #tmp=copy(a2)
     #tmp.extend(a1)
     #x2 = T.stack(tmp,axis=1)
-    a3 = 1/(1+T.exp(-T.dot(a2,w3)-b3))    
+    a3 = 1/(1+T.exp(-T.dot(a2,w3)-b3)) 
 
-    a_hat = T.vector('a_hat') #Actual output
+    a_hat = T.matrix('a_hat') #Actual output
 
+    '''
+    tmp=a_hat-a3
+    print 'tmp test value 1:'
+    print tmp.test_value
+    tmp=tmp**2
+    print 'tmp test value 2:'
+    print tmp.test_value
+    '''
     cost = T.sum((a_hat - a3)**2)
+    #print 'cost test value:'
+    #print cost.tag.test_value
     
 
     dw1,dw2,dw3,db1,db2,db3=T.grad(cost,[w1,w2,w3,b1,b2,b3])
@@ -51,7 +66,7 @@ def layout_1(inputs,outputs):
     #训练函数
     train = function(
         inputs = [x,a_hat],
-        outputs = [a2[0],a3,cost],
+        outputs = [w1,w2,w3,dw1,dw2,dw3,a3,cost],
         updates = u_list
         #profile=True
     )
@@ -59,19 +74,31 @@ def layout_1(inputs,outputs):
     print 'Start Training'
     # 遍历输入并计算输出:
     cost = []
-    for iteration in range(300000):
-        _pre,pred, cost_iter = train(inputs, outputs)
+    w_=[]
+    dw_=[]
+    for iteration in xrange(1):
+        w_1,w_2,w_3,dw_1,dw_2,dw_3,pred, cost_iter = train(inputs, outputs)
+        w_.append([w_1,w_2,w_3])
+        dw_.append([dw_1,dw_2,dw_3])
         print '###Iter: '+str(iteration)+'  cost: '+str(cost_iter)+' ###'
         cost.append(cost_iter)
-
+    '''
+    f1=open('w.txt','wb')
+    f2=open('wb.txt','wb')
+    print >>f1,w_[200:500]
+    print >>f2,dw_[200:500]
+    f1.close()
+    f2.close()
+    '''
     # 打印输出    
     print 'The outputs of the NN are:'
     for i in range(len(inputs)):
-        print 'Real: %.5f | Predc: %.5f' % (outputs[i],pred[i])
-
+        print 'Real: %.5f | Predc: %.5f' % (outputs[i][0],pred[i][0])
+    print 'Final cost: %.5f'%(cost[-1])
+    
 
     #存储
-    output=open('C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170323\\1\\1.pkl','wb')
+    output=open('C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170323\\3\\1.pkl','wb')
     temp={}
     temp['pred']=pred
     temp['expec']=outputs
@@ -82,9 +109,6 @@ def layout_1(inputs,outputs):
     temp['w'].append(w1)
     temp['w'].append(w2)
     temp['w'].append(w3)
-    temp['w'].append(w4)
-    temp['w'].append(w5)
-    temp['w'].append(w6)
 
     pickle.dump(temp,output)
 
@@ -93,16 +117,16 @@ def layout_1(inputs,outputs):
     #matplotlib inline
     figure(1)
     title('Variation of Cost')
-    plot(cost)
+    plot(cost,label='cost')
     legend(loc='upper left')
-    savefig('C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170323\\1\\cost.png')
+    savefig('C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170323\\3\\cost.png')
 
     figure(2)
     title('Prediction and Expectation')
     plot(pred,label='p')
     plot(result,label='e')
     legend(loc='upper left')
-    savefig('C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170323\\1\\prediction.png')
+    savefig('C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170323\\3\\prediction.png')
     show()
 
         
