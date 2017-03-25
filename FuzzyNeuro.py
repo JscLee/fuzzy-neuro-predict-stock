@@ -9,6 +9,7 @@ from random import random
 from matplotlib.pyplot import *
 theano.config.compute_test_value = 'warn'
 #from theano.printing import Print
+dir='C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170323\\3'
 
 def layout_1(inputs,outputs):
     #2初始化网络(2层隐含层)
@@ -76,20 +77,20 @@ def layout_1(inputs,outputs):
     cost = []
     w_=[]
     dw_=[]
-    for iteration in xrange(1):
+    for iteration in xrange(1000):
         w_1,w_2,w_3,dw_1,dw_2,dw_3,pred, cost_iter = train(inputs, outputs)
         w_.append([w_1,w_2,w_3])
         dw_.append([dw_1,dw_2,dw_3])
         print '###Iter: '+str(iteration)+'  cost: '+str(cost_iter)+' ###'
         cost.append(cost_iter)
-    '''
-    f1=open('w.txt','wb')
-    f2=open('wb.txt','wb')
+    
+    f1=open(dir+'\\w.txt','wb')
+    f2=open(dir+'\\wb.txt','wb')
     print >>f1,w_[200:500]
     print >>f2,dw_[200:500]
     f1.close()
     f2.close()
-    '''
+    
     # 打印输出    
     print 'The outputs of the NN are:'
     for i in range(len(inputs)):
@@ -98,7 +99,7 @@ def layout_1(inputs,outputs):
     
 
     #存储
-    output=open('C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170323\\3\\1.pkl','wb')
+    output=open(dir+'\\data.pkl','wb')
     temp={}
     temp['pred']=pred
     temp['expec']=outputs
@@ -119,14 +120,14 @@ def layout_1(inputs,outputs):
     title('Variation of Cost')
     plot(cost,label='cost')
     legend(loc='upper left')
-    savefig('C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170323\\3\\cost.png')
+    savefig(dir+'\\cost.png')
 
     figure(2)
     title('Prediction and Expectation')
     plot(pred,label='p')
     plot(result,label='e')
     legend(loc='upper left')
-    savefig('C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170323\\3\\prediction.png')
+    savefig(dir+'\\prediction.png')
     show()
 
         
