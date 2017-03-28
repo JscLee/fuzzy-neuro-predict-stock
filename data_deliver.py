@@ -61,7 +61,7 @@ def cal_cor():
 
 def get_data():
     df=DataFrame()
-    df=(ts.get_hist_data('hs300',start='2009-01-01',end='2017-01-01',ktype='D'))[index[:6]+['price_change']]
+    df=(ts.get_hist_data('hs300',start='2005-01-01',end='2017-01-01',ktype='D'))[index[:6]+['price_change']]
     df=df.sort_index()
     #ReturnRate=ln(s(t）/s(t-1))  lag=1
     df.insert(0,'ReturnRate',df['close'])    
@@ -132,7 +132,7 @@ def get_data():
         show()
     
     df=df.drop(['price_change'],axis=1)       
-    output = open('raw_data', 'wb')
+    output = open('raw_data.pkl', 'wb')
     pickle.dump(df,output)
     pickle.dump(index,output)
     output.close()

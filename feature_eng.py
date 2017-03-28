@@ -34,7 +34,7 @@ pack['result']=result.T.tolist()
 
 #绘图
 if True:
-    '''
+    
     for i in xrange(len(pack['index'])):
         plot(data.tolist()[i],label=pack['index'][i])
     #plot(pack['result'],label='result')
@@ -47,7 +47,7 @@ if True:
         #plot(pack['result'],label='result')
         #legend(loc='upper left')
         savefig(dir+'\\'+pack['index'][i]+'.png',dpi=200)
-    '''
+    
     figure()
     plot(pack['result'],label='result')
     savefig(dir+'\\result.png',dpi=200)

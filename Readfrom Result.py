@@ -11,7 +11,7 @@ cost=temp['cost']
 iteration=temp['iter']
 learning_rate=temp['l_rate']
 w=temp['w']
-
+'''
 #matplotlib inline
 figure(1)
 title('Variation of Cost')
@@ -26,3 +26,4 @@ plot(result,label='e')
 legend(loc='upper left')
 savefig('C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170323\\2\\prediction.png')
 show()
+'''
