@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>44d56941-61a6-4b94-8ea0-80c87b765db1</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>FuzzyNeuro.py</StartupFile>
+    <StartupFile>feature_eng.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
