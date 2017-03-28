@@ -10,7 +10,7 @@ from matplotlib.pyplot import *
 theano.config.compute_test_value = 'warn'
 #from theano.printing import Print
 import random
-dir='C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170328\\2'
+dir='C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170328\\3'
 def shuffle_exp(inputs,outputs,i):
     random.seed(i)
     random.shuffle(inputs,random.random)
@@ -36,14 +36,14 @@ def layout_1(inputs,outputs):
 
     #构造四层全连接网络
     print 'Init network'
-    a1=1/(1+T.exp(-T.dot(x,w1)-b1))
+    a1=1/(1+T.exp(T.dot(x,w1)+b1))
 
-    a2=1/(1+T.exp(-T.dot(a1,w2)-b2))
+    a2=1/(1+T.exp(T.dot(a1,w2)+b2))
     
     #tmp=copy(a2)
     #tmp.extend(a1)
     #x2 = T.stack(tmp,axis=1)
-    a3 = 1/(1+T.exp(-T.dot(a2,w3)-b3)) 
+    a3 = 1/(1+T.exp(T.dot(a2,w3)+b3)) 
 
     a_hat = T.matrix('a_hat') #Actual output
 
@@ -83,7 +83,7 @@ def layout_1(inputs,outputs):
     cost = []
     w_=[]
     dw_=[]
-    for iteration in xrange(1000):
+    for iteration in xrange(2000):
         batch=20
         cost_iter=0
         pred=[]
