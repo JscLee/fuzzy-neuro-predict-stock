@@ -9,35 +9,36 @@ from random import random
 from matplotlib.pyplot import *
 theano.config.compute_test_value = 'warn'
 #from theano.printing import Print
-dir='C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170323\\3'
+dir='C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170325\\1'
 
 def layout_1(inputs,outputs):
     #2初始化网络(2层隐含层)
     x = T.matrix('x')
-    x.tag.test_value=np.matrix(np.ones([6,6]),dtype=theano.config.floatX)
+    #x.tag.test_value=np.matrix(np.ones([3,6]),dtype=theano.config.floatX)
 
     w1=theano.shared(np.array(np.random.rand(6,6), dtype=theano.config.floatX))
-    w1.tag.test_value=np.matrix(np.ones([6,6]),dtype=theano.config.floatX)
+    #w1.tag.test_value=np.matrix(np.ones([6,6]),dtype=theano.config.floatX)
     w2=theano.shared(np.array(np.random.rand(6,6), dtype=theano.config.floatX))
     w3=theano.shared(np.array(np.random.rand(6,1), dtype=theano.config.floatX))
 
 
-    b1 = theano.shared(1.)
-    b2 = theano.shared(1.)
-    b3 = theano.shared(1.)
-    learning_rate = 0.02
-    
+    b1 = theano.shared(0.000000001)
+    b2 = theano.shared(0.000000001)
+    b3 = theano.shared(0.000000001)
+    learning_rate = 0.01
+
 
     #构造四层全连接网络
     print 'Init network'
-    a1=1/(1+T.exp(-T.dot(x,w1)-b1))
+    a1=T.nnet.relu(T.dot(x,w1)+b1)
+    #print a1.tag.test_value
 
-    a2=1/(1+T.exp(-T.dot(a1,w2)-b2))
+    a2=T.nnet.relu(T.dot(a1,w2)+b2)
     
     #tmp=copy(a2)
     #tmp.extend(a1)
     #x2 = T.stack(tmp,axis=1)
-    a3 = 1/(1+T.exp(-T.dot(a2,w3)-b3)) 
+    a3=T.nnet.relu(T.dot(a2,w3)+b3)
 
     a_hat = T.matrix('a_hat') #Actual output
 
@@ -67,7 +68,7 @@ def layout_1(inputs,outputs):
     #训练函数
     train = function(
         inputs = [x,a_hat],
-        outputs = [w1,w2,w3,dw1,dw2,dw3,a3,cost],
+        outputs = [a1,w1,w2,w3,dw1,dw2,dw3,a3,cost],
         updates = u_list
         #profile=True
     )
@@ -78,10 +79,11 @@ def layout_1(inputs,outputs):
     w_=[]
     dw_=[]
     for iteration in xrange(1000):
-        w_1,w_2,w_3,dw_1,dw_2,dw_3,pred, cost_iter = train(inputs, outputs)
+        a_1,w_1,w_2,w_3,dw_1,dw_2,dw_3,pred, cost_iter = train(inputs, outputs)
         w_.append([w_1,w_2,w_3])
         dw_.append([dw_1,dw_2,dw_3])
-        print '###Iter: '+str(iteration)+'  cost: '+str(cost_iter)+' ###'
+        print a_1
+        #print '###Iter: '+str(iteration)+'  cost: '+str(cost_iter)+' ###'
         cost.append(cost_iter)
     
     f1=open(dir+'\\w.txt','wb')
@@ -134,6 +136,6 @@ def layout_1(inputs,outputs):
 
 input=open('1day_matrix.pkl','rb')
 pack=pickle.load(input)
-result=pack['result']
-data=pack['data']
+result=pack['result'][:10]
+data=pack['data'][:10]
 layout_1(data,result)
