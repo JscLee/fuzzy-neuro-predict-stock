@@ -8,7 +8,7 @@ from pandas import DataFrame,Series
 from matplotlib.pyplot import *
 index=['open','close','high','low','volume','v_ma20','alpha#6','alpha#23','alpha#28','alpha#54','alpha#101']
 lag=20
-
+dir='C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170325\\1'
 def cal_cor():
     cor=list()
     df=DataFrame()
@@ -50,18 +50,18 @@ def cal_cor():
             plot(pack['data'].tolist()[i],label=pack['index'][i])
         plot(pack['result'].T.tolist()[0],linewidth=2.5,label='result')
         legend(loc='upper left')
-        savefig('C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170320\\1\\raw_data.png',dpi=200)
+        savefig(dir+'\\raw_data.png',dpi=200)
         #分别描绘六个特征
         for i in xrange(len(pack['index'])):
             figure()
             plot(pack['data'].tolist()[i],label=pack['index'][i])
             legend(loc='upper left')
-            savefig('C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170320\\1\\'+pack['index'][i]+'_raw.png',dpi=200)
+            savefig(dir+'\\'+pack['index'][i]+'_raw.png',dpi=200)
        
 
 def get_data():
     df=DataFrame()
-    df=(ts.get_hist_data('hs300',start='2013-01-01',end='2017-01-01',ktype='D'))[index[:6]+['price_change']]
+    df=(ts.get_hist_data('hs300',start='2009-01-01',end='2017-01-01',ktype='D'))[index[:6]+['price_change']]
     df=df.sort_index()
     #ReturnRate=ln(s(t）/s(t-1))  lag=1
     df.insert(0,'ReturnRate',df['close'])    
@@ -132,7 +132,7 @@ def get_data():
         show()
     
     df=df.drop(['price_change'],axis=1)       
-    output = open('raw_data.pkl', 'wb')
+    output = open('raw_data', 'wb')
     pickle.dump(df,output)
     pickle.dump(index,output)
     output.close()
