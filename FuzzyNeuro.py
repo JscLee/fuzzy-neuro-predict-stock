@@ -10,7 +10,7 @@ from matplotlib.pyplot import *
 theano.config.compute_test_value = 'warn'
 #from theano.printing import Print
 import random
-dir='C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170328\\1'
+dir='C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170328\\2'
 def shuffle_exp(inputs,outputs,i):
     random.seed(i)
     random.shuffle(inputs,random.random)
@@ -20,10 +20,10 @@ def shuffle_exp(inputs,outputs,i):
 def layout_1(inputs,outputs):
     #2初始化网络(2层隐含层)
     x = T.matrix('x')
-    x.tag.test_value=np.matrix(np.ones([6,6]),dtype=theano.config.floatX)
+    #x.tag.test_value=np.matrix(np.ones([6,6]),dtype=theano.config.floatX)
 
     w1=theano.shared(np.array(np.random.rand(6,6), dtype=theano.config.floatX))
-    w1.tag.test_value=np.matrix(np.ones([6,6]),dtype=theano.config.floatX)
+    #w1.tag.test_value=np.matrix(np.ones([6,6]),dtype=theano.config.floatX)
     w2=theano.shared(np.array(np.random.rand(6,6), dtype=theano.config.floatX))
     w3=theano.shared(np.array(np.random.rand(6,1), dtype=theano.config.floatX))
 
@@ -31,7 +31,7 @@ def layout_1(inputs,outputs):
     b1 = theano.shared(0.)
     b2 = theano.shared(0.)
     b3 = theano.shared(0.)
-    learning_rate = 0.005
+    learning_rate = 0.0001
     
 
     #构造四层全连接网络
@@ -83,15 +83,18 @@ def layout_1(inputs,outputs):
     cost = []
     w_=[]
     dw_=[]
-    for iteration in xrange(10000):
+    for iteration in xrange(1000):
         batch=20
         cost_iter=0
+        pred=[]
         while batch<len(inputs):
-            w_1,w_2,w_3,dw_1,dw_2,dw_3,pred, c_ = train(inputs[batch-20:batch], outputs[batch-20:batch])
+            w_1,w_2,w_3,dw_1,dw_2,dw_3,p_, c_ = train(inputs[batch-20:batch], outputs[batch-20:batch])
             cost_iter=cost_iter+c_
             batch=batch+20
-        w_1,w_2,w_3,dw_1,dw_2,dw_3,pred,  c_ = train(inputs[batch-20:len(inputs)], outputs[batch-20:len(inputs)]) #last batch
+            pred.extend(p_)
+        w_1,w_2,w_3,dw_1,dw_2,dw_3,p_, c_ = train(inputs[batch-20:len(inputs)], outputs[batch-20:len(inputs)]) #last batch
         cost_iter=cost_iter+c_
+        pred.extend(p_)
         w_.append([w_1,w_2,w_3])
         dw_.append([dw_1,dw_2,dw_3])
         cost.append(cost_iter)
@@ -106,12 +109,13 @@ def layout_1(inputs,outputs):
     f1.close()
     f2.close()
     
+    '''
     # 打印输出    
     print 'The outputs of the NN are:'
     for i in range(len(inputs)):
         print 'Real: %.5f | Predc: %.5f' % (outputs[i][0],pred[i][0])
     print 'Final cost: %.5f'%(cost[-1])
-    
+    '''
 
     #存储
     output=open(dir+'\\data.pkl','wb')
