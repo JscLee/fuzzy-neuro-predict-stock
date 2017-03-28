@@ -10,7 +10,7 @@ from matplotlib.pyplot import *
 theano.config.compute_test_value = 'warn'
 #from theano.printing import Print
 import random
-dir='C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170328\\2'
+dir='C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170328\\3'
 def shuffle_exp(inputs,outputs,i):
     random.seed(i)
     random.shuffle(inputs,random.random)
@@ -20,7 +20,7 @@ def shuffle_exp(inputs,outputs,i):
 def layout_1(inputs,outputs):
     #2初始化网络(2层隐含层)
     x = T.matrix('x')
-    #x.tag.test_value=np.matrix(np.ones([6,6]),dtype=theano.config.floatX)
+    #x.tag.test_value=np.matrix(np.ones([3,6]),dtype=theano.config.floatX)
 
     w1=theano.shared(np.array(np.random.rand(6,6), dtype=theano.config.floatX))
     #w1.tag.test_value=np.matrix(np.ones([6,6]),dtype=theano.config.floatX)
@@ -31,19 +31,22 @@ def layout_1(inputs,outputs):
     b1 = theano.shared(0.)
     b2 = theano.shared(0.)
     b3 = theano.shared(0.)
-    learning_rate = 0.0001
+    learning_rate = 0.001
     
 
     #构造四层全连接网络
     print 'Init network'
-    a1=1/(1+T.exp(-T.dot(x,w1)-b1))
+    a1=T.nnet.relu((T.dot(x,w1)+b1))
+    #print a1.tag.test_value
 
-    a2=1/(1+T.exp(-T.dot(a1,w2)-b2))
+    a2=T.nnet.relu((T.dot(a1,w2)+b2))
+    #print a2.tag.test_value
     
     #tmp=copy(a2)
     #tmp.extend(a1)
     #x2 = T.stack(tmp,axis=1)
-    a3 = 1/(1+T.exp(-T.dot(a2,w3)-b3)) 
+    a3 = T.nnet.relu((T.dot(a2,w3)+b3))
+    #print a3.tag.test_value
 
     a_hat = T.matrix('a_hat') #Actual output
 
