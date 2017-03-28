@@ -9,7 +9,13 @@ from random import random
 from matplotlib.pyplot import *
 theano.config.compute_test_value = 'warn'
 #from theano.printing import Print
-dir='C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170325\\2'
+import random
+dir='C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170328\\1'
+def shuffle_exp(inputs,outputs,i):
+    random.seed(i)
+    random.shuffle(inputs,random.random)
+    random.seed(i)
+    random.shuffle(outputs,random.random)
 
 def layout_1(inputs,outputs):
     #2初始化网络(2层隐含层)
@@ -25,7 +31,7 @@ def layout_1(inputs,outputs):
     b1 = theano.shared(0.)
     b2 = theano.shared(0.)
     b3 = theano.shared(0.)
-    learning_rate = 0.01
+    learning_rate = 0.005
     
 
     #构造四层全连接网络
@@ -77,12 +83,21 @@ def layout_1(inputs,outputs):
     cost = []
     w_=[]
     dw_=[]
-    for iteration in xrange(50000):
-        w_1,w_2,w_3,dw_1,dw_2,dw_3,pred, cost_iter = train(inputs, outputs)
+    for iteration in xrange(10000):
+        batch=20
+        cost_iter=0
+        while batch<len(inputs):
+            w_1,w_2,w_3,dw_1,dw_2,dw_3,pred, c_ = train(inputs[batch-20:batch], outputs[batch-20:batch])
+            cost_iter=cost_iter+c_
+            batch=batch+20
+        w_1,w_2,w_3,dw_1,dw_2,dw_3,pred,  c_ = train(inputs[batch-20:len(inputs)], outputs[batch-20:len(inputs)]) #last batch
+        cost_iter=cost_iter+c_
         w_.append([w_1,w_2,w_3])
         dw_.append([dw_1,dw_2,dw_3])
-        print '###Iter: '+str(iteration)+'  cost: '+str(cost_iter)+' ###'
         cost.append(cost_iter)
+        print '###Iter: '+str(iteration)+'  cost: '+str(cost_iter)+' ###'
+
+        shuffle_exp(inputs,outputs,iteration)
     
     f1=open(dir+'\\w.txt','wb')
     f2=open(dir+'\\wb.txt','wb')
