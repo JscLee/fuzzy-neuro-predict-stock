@@ -42,16 +42,19 @@ def layout_1(inputs,outputs):
 
     #构造四层全连接网络
     print 'Init network'
-    a1=1/(1+T.exp(T.dot(x,w1)+b1))
+    tmp=T.dot(x,w1)
+    #print tmp.tag.test_value
+    a1=T.nnet.relu((T.dot(x,w1)+b1))
+    #print a1.tag.test_value
 
-    a2=1/(1+T.exp(T.dot(a1,w2)+b2))
+    a2=T.nnet.relu((T.dot(a1,w2)+b2))
+    #print a2.tag.test_value
     
     #tmp=copy(a2)
     #tmp.extend(a1)
     #x2 = T.stack(tmp,axis=1)
-    a3 = 1/(1+T.exp(T.dot(a2,w3)+b3)) 
-
-    a_hat = T.matrix('a_hat') #Actual output
+    a3 = T.nnet.relu((T.dot(a2,w3)+b3))
+    #print a3.tag.test_value
 
     '''
     tmp=a_hat-a3
