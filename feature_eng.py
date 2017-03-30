@@ -3,7 +3,7 @@ from __future__ import division
 import numpy as np
 import pickle
 from matplotlib.pyplot import *
-dir='C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170325\\2'
+dir='C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170330\\1'
 def read_data():
     input=open('filter_cor.pkl','rb')
     pack=pickle.load(input)
@@ -26,7 +26,7 @@ plot(pack['result'].T.tolist()[0])
 data=np.matrix([])
 data=np.mean(data, axis = 0)
 data=normalize(pack['index'],pack['data'])
-result=normalize(pack['index'],pack['result'].T)
+result=normalize(pack['index'],pack['result'])
 #Data:matrix: index by features rows:features, columns: dates
 #pack['data']:index by examples
 pack['data']=data.T.tolist()

@@ -7,21 +7,21 @@ from copy import copy
 from pandas import DataFrame,Series
 from matplotlib.pyplot import *
 index=['open','close','high','low','volume','v_ma20','alpha#6','alpha#23','alpha#28','alpha#54','alpha#101']
-lag=20
-dir='C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170325\\1'
+lag=25
+dir='C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170330\\1'
 def cal_cor():
     cor=list()
     df=DataFrame()
     input= open('raw_data.pkl', 'rb')
     df=pickle.load(input)   
-    data=np.matrix(df)
+    data=np.matrix(df,dtype=np.float64)
     data=(data.T)[1:,:-1]
-    rate=df.as_matrix(['ReturnRate'])[1:]
+    rate=np.matrix(df['ReturnRate'][1:],dtype=np.float64)
     #filter cor
     a=[]
     for i in xrange(data.shape[0]):
-        cor.append(np.corrcoef(rate.T,data[i])[0][1])
-        if abs(cor[i])<0.03:
+        cor.append(np.corrcoef(rate,data[i])[0][1])
+        if abs(cor[i])<0.034:
             a.append(i)
             print 'del:'+index[i]+':'+str(cor[i])
         else:
@@ -61,23 +61,25 @@ def cal_cor():
 
 def get_data():
     df=DataFrame()
-    df=(ts.get_hist_data('hs300',start='2005-01-01',end='2017-01-01',ktype='D'))[index[:6]+['price_change']]
-    df=df.sort_index()
+    df=(ts.get_k_data('000300',index=True,start='2009-01-01',end='2017-01-01',ktype='D'))[['date']+index[:5]]
+    df=df.sort_index()    
+    date=df['date']
+    df=df[index[:5]]
+    df['low'][1510]=3932.870 #接口包中数据错误
+
     #ReturnRate=ln(s(t）/s(t-1))  lag=1
-    df.insert(0,'ReturnRate',df['close'])    
-    temp=1
-    for i in df.index:
-        df['ReturnRate'][i]=np.log(df['close'][i]/temp)
-        temp=df['close'][i]
+    df.insert(0,'ReturnRate',df['close'])   
+    for i in xrange(1,len(df.index)):
+        df['ReturnRate'][i]=np.log(df['close'][i]/df['close'][i-1])
 
     #alpha#6 lag=10
-    df.insert(7,'alpha#6',df['open'])
+    df.insert(6,'alpha#6',df['open'])
     for i in xrange(10,len(df.index)):
         df['alpha#6'][i]=np.corrcoef(df['open'][i-10:i],df['volume'][i-10:i])[0][1]
 
     
     #alpha#23 lag=20
-    df.insert(8,'alpha#23',df['high'])   
+    df.insert(7,'alpha#23',df['high'])   
     #过去20天最高价的均值
     df['alpha#23'][20]=df['high'][:20].sum()/20.0  
     for i in xrange(21,len(df.index)):
@@ -97,13 +99,18 @@ def get_data():
     show()
     '''
     #alpha#28 lag=5
+    df.insert(6,'v_ma20',df['volume'])   
+    df['v_ma20'][20]=df['volume'][:20].sum()/20.0  
+    for i in xrange(21,len(df.index)):
+        df['v_ma20'][i]=(20*df['v_ma20'][i-1]-df['volume'][i-21]+df['volume'][i-1])/20.0
+
     df.insert(9,'alpha#28',df['high'])   
     temp=0
-    for i in xrange(5,len(df.index)):
+    for i in xrange(25,len(df.index)):
         df['alpha#28'][i]=np.corrcoef(df['v_ma20'][i-5:i],df['low'][i-5:i])[0][1]+(df['high'][i]+df['low'][i])/2.0-df['close'][i]
 
-    temp=abs(df['alpha#28'][20:]).sum()
-    for i in xrange(lag,len(df.index)):
+    temp=abs(df['alpha#28'][25:]).sum()
+    for i in xrange(25,len(df.index)):
         df['alpha#28'][i]=df['alpha#28'][i]/temp
 
 
@@ -114,24 +121,23 @@ def get_data():
         df['alpha#54'][i]=(-1*(df['low'][i]-df['close'][i])*pow(df['open'][i],5))/((df['low'][i]-df['high'][i])*pow(df['close'][i],5))
 
     #alpha#101 lag=0
-    df.insert(11,'alpha#101',df['high'])  
+    df.insert(11,'alpha#101',df['high']) 
     for i in xrange(len(df.index)):
         df['alpha#101'][i]=(df['close'][i]-df['open'][i])/(df['high'][i]-df['low'][i]+0.001) 
         
-
-    df=df[lag:]
     
+    df=df[lag:]
+    '''
     #绘图
     if True:
         plot(df['alpha#6'],label='alpha#6')
-        #plot(df['alpha#23'],label='alpha#23')
+        plot(df['alpha#23'],label='alpha#23')
         plot(df['alpha#28'],label='alpha#28')
         plot(df['alpha#54'],label='alpha#54')
         plot(df['alpha#101'],label='alpha#101')
         legend(loc='upper left')
         show()
-    
-    df=df.drop(['price_change'],axis=1)       
+    '''  
     output = open('raw_data.pkl', 'wb')
     pickle.dump(df,output)
     pickle.dump(index,output)
