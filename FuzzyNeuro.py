@@ -10,7 +10,13 @@ from matplotlib.pyplot import *
 theano.config.compute_test_value = 'warn'
 #from theano.printing import Print
 import random
-dir='C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170330\\2'
+from os.path import exists
+from os import mkdir
+
+dir='C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170330\\5'
+if not exists(dir):
+    mkdir(dir)
+
 def shuffle_exp(inputs,outputs,i):
     random.seed(i)
     random.shuffle(inputs,random.random)
@@ -23,32 +29,27 @@ def layout_1(inputs,outputs):
     #x.tag.test_value=inputs[:3]
     #x.tag.test_value=np.matrix(np.ones([3,6]),dtype=theano.config.floatX)
 
-    w1=theano.shared(np.array(np.random.rand(6,6), dtype=theano.config.floatX))
-    w2=theano.shared(np.array(np.random.rand(6,6), dtype=theano.config.floatX))
-    w3=theano.shared(np.array(np.random.rand(6,1), dtype=theano.config.floatX))
+    w1=theano.shared(np.array(np.random.rand(6,50), dtype=theano.config.floatX))
+    w2=theano.shared(np.array(np.random.rand(50,10), dtype=theano.config.floatX))
+    w3=theano.shared(np.array(np.random.rand(10,1), dtype=theano.config.floatX))
 
 
-    b1 = theano.shared(0.)
-    b2 = theano.shared(0.)
-    b3 = theano.shared(0.)
-    learning_rate = 0.00001
+    b1 = theano.shared(1.)
+    b2 = theano.shared(1.)
+    b3 = theano.shared(1.)
+    learning_rate = 0.001
     
 
     #构造四层全连接网络
     print 'Init network'
-    tmp=T.dot(x,w1)
-    #print tmp.tag.test_value
-    a1=T.nnet.relu((T.dot(x,w1)+b1))
-    #print a1.tag.test_value
+    a1=1/(1+T.exp(T.dot(x,w1)+b1))
 
-    a2=T.nnet.relu((T.dot(a1,w2)+b2))
-    #print a2.tag.test_value
+    a2=1/(1+T.exp(T.dot(a1,w2)+b2))
     
     #tmp=copy(a2)
     #tmp.extend(a1)
     #x2 = T.stack(tmp,axis=1)
-    a3 = T.nnet.relu((T.dot(a2,w3)+b3))
-    #print a3.tag.test_value
+    a3 = 1/(1+T.exp(T.dot(a2,w3)+b3)) 
 
     a_hat = T.matrix('a_hat') #Actual output
 
@@ -89,7 +90,7 @@ def layout_1(inputs,outputs):
     w_=[]
     dw_=[]
     b_size=30
-    for iteration in xrange(5000):
+    for iteration in xrange(1000):
         batch=b_size
         cost_iter=0
         pred=[]
