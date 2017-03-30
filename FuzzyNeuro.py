@@ -10,7 +10,7 @@ from matplotlib.pyplot import *
 theano.config.compute_test_value = 'warn'
 #from theano.printing import Print
 import random
-dir='C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170328\\7'
+dir='C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170330\\2'
 def shuffle_exp(inputs,outputs,i):
     random.seed(i)
     random.shuffle(inputs,random.random)
@@ -20,10 +20,10 @@ def shuffle_exp(inputs,outputs,i):
 def layout_1(inputs,outputs):
     #2初始化网络(2层隐含层)
     x = T.matrix('x')
-    #x.tag.test_value=np.matrix(np.ones([6,6]),dtype=theano.config.floatX)
+    #x.tag.test_value=inputs[:3]
+    #x.tag.test_value=np.matrix(np.ones([3,6]),dtype=theano.config.floatX)
 
     w1=theano.shared(np.array(np.random.rand(6,6), dtype=theano.config.floatX))
-    #w1.tag.test_value=np.matrix(np.ones([6,6]),dtype=theano.config.floatX)
     w2=theano.shared(np.array(np.random.rand(6,6), dtype=theano.config.floatX))
     w3=theano.shared(np.array(np.random.rand(6,1), dtype=theano.config.floatX))
 
@@ -31,7 +31,7 @@ def layout_1(inputs,outputs):
     b1 = theano.shared(0.)
     b2 = theano.shared(0.)
     b3 = theano.shared(0.)
-    learning_rate = 0.0001
+    learning_rate = 0.00001
     
 
     #构造四层全连接网络
@@ -73,28 +73,30 @@ def layout_1(inputs,outputs):
     #训练函数
     train = function(
         inputs = [x,a_hat],
-        outputs = [w1,w2,w3,dw1,dw2,dw3,a3,cost],
+        outputs = [a1,a2,a3,w1,w2,w3,dw1,dw2,dw3,a3,cost],
         updates = u_list
         #profile=True
     )
 
     print 'Start Training'
-    # 遍历输入并计算输出:
+    # 迭代
     cost = []
     w_=[]
     dw_=[]
-    for iteration in xrange(10000):
-        batch=20
+    b_size=30
+    for iteration in xrange(5000):
+        batch=b_size
         cost_iter=0
         pred=[]
         while batch<len(inputs):
-            w_1,w_2,w_3,dw_1,dw_2,dw_3,p_, c_ = train(inputs[batch-20:batch], outputs[batch-20:batch])
+            a1,a2,a3,w_1,w_2,w_3,dw_1,dw_2,dw_3,p_, c_ = train(inputs[batch-b_size:batch], outputs[batch-b_size:batch])
             cost_iter=cost_iter+c_
-            batch=batch+20
+            batch=batch+b_size
             pred.extend(p_)
-        w_1,w_2,w_3,dw_1,dw_2,dw_3,p_, c_ = train(inputs[batch-20:len(inputs)], outputs[batch-20:len(inputs)]) #last batch
+        a1,a2,a3,w_1,w_2,w_3,dw_1,dw_2,dw_3,p_, c_ = train(inputs[batch-b_size:len(inputs)], outputs[batch-b_size:len(inputs)]) #last batch
         cost_iter=cost_iter+c_
         pred.extend(p_)
+
         w_.append([w_1,w_2,w_3])
         dw_.append([dw_1,dw_2,dw_3])
         cost.append(cost_iter)
