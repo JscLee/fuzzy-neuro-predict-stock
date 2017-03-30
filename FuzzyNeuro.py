@@ -10,7 +10,7 @@ from matplotlib.pyplot import *
 theano.config.compute_test_value = 'warn'
 #from theano.printing import Print
 import random
-dir='C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170328\\3'
+dir='C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170330\\1'
 def shuffle_exp(inputs,outputs,i):
     random.seed(i)
     random.shuffle(inputs,random.random)
@@ -20,10 +20,10 @@ def shuffle_exp(inputs,outputs,i):
 def layout_1(inputs,outputs):
     #2初始化网络(2层隐含层)
     x = T.matrix('x')
+    x.tag.test_value=inputs[:3]
     #x.tag.test_value=np.matrix(np.ones([3,6]),dtype=theano.config.floatX)
 
     w1=theano.shared(np.array(np.random.rand(6,6), dtype=theano.config.floatX))
-    #w1.tag.test_value=np.matrix(np.ones([6,6]),dtype=theano.config.floatX)
     w2=theano.shared(np.array(np.random.rand(6,6), dtype=theano.config.floatX))
     w3=theano.shared(np.array(np.random.rand(6,1), dtype=theano.config.floatX))
 
@@ -31,22 +31,24 @@ def layout_1(inputs,outputs):
     b1 = theano.shared(0.)
     b2 = theano.shared(0.)
     b3 = theano.shared(0.)
-    learning_rate = 0.001
+    learning_rate = 0.00001
     
 
     #构造四层全连接网络
     print 'Init network'
+    tmp=T.dot(x,w1)
+    print tmp.tag.test_value
     a1=T.nnet.relu((T.dot(x,w1)+b1))
-    #print a1.tag.test_value
+    print a1.tag.test_value
 
     a2=T.nnet.relu((T.dot(a1,w2)+b2))
-    #print a2.tag.test_value
+    print a2.tag.test_value
     
     #tmp=copy(a2)
     #tmp.extend(a1)
     #x2 = T.stack(tmp,axis=1)
     a3 = T.nnet.relu((T.dot(a2,w3)+b3))
-    #print a3.tag.test_value
+    print a3.tag.test_value
 
     a_hat = T.matrix('a_hat') #Actual output
 
@@ -76,7 +78,7 @@ def layout_1(inputs,outputs):
     #训练函数
     train = function(
         inputs = [x,a_hat],
-        outputs = [w1,w2,w3,dw1,dw2,dw3,a3,cost],
+        outputs = [a1,a2,a3,w1,w2,w3,dw1,dw2,dw3,a3,cost],
         updates = u_list
         #profile=True
     )
@@ -86,16 +88,16 @@ def layout_1(inputs,outputs):
     cost = []
     w_=[]
     dw_=[]
-    for iteration in xrange(1000):
+    for iteration in xrange(5000):
         batch=20
         cost_iter=0
         pred=[]
         while batch<len(inputs):
-            w_1,w_2,w_3,dw_1,dw_2,dw_3,p_, c_ = train(inputs[batch-20:batch], outputs[batch-20:batch])
+            a1,a2,a3,w_1,w_2,w_3,dw_1,dw_2,dw_3,p_, c_ = train(inputs[batch-20:batch], outputs[batch-20:batch])
             cost_iter=cost_iter+c_
             batch=batch+20
             pred.extend(p_)
-        w_1,w_2,w_3,dw_1,dw_2,dw_3,p_, c_ = train(inputs[batch-20:len(inputs)], outputs[batch-20:len(inputs)]) #last batch
+        a1,a2,a3,w_1,w_2,w_3,dw_1,dw_2,dw_3,p_, c_ = train(inputs[batch-20:len(inputs)], outputs[batch-20:len(inputs)]) #last batch
         cost_iter=cost_iter+c_
         pred.extend(p_)
         w_.append([w_1,w_2,w_3])
