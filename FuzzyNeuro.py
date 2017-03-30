@@ -10,7 +10,7 @@ from matplotlib.pyplot import *
 theano.config.compute_test_value = 'warn'
 #from theano.printing import Print
 import random
-dir='C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170328\\3'
+dir='C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170328\\7'
 def shuffle_exp(inputs,outputs,i):
     random.seed(i)
     random.shuffle(inputs,random.random)
@@ -83,7 +83,7 @@ def layout_1(inputs,outputs):
     cost = []
     w_=[]
     dw_=[]
-    for iteration in xrange(2000):
+    for iteration in xrange(10000):
         batch=20
         cost_iter=0
         pred=[]
