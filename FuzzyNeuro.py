@@ -19,10 +19,7 @@ outputs=[]
 
 if not exists(dir):
     mkdir(dir)
-def plot_pre():
-    plot(pred)
-    plot(outputs)
-    show()
+
 def shuffle_exp(inputs,outputs,i):
     random.seed(i)
     random.shuffle(inputs,random.random)
@@ -126,6 +123,13 @@ def layout_1(inputs,outputs):
         shuffle_exp(inputs,outputs,iteration)   #打乱训练集，结束一轮迭代
         if end_train:   #结束训练
             break
+
+        if iteration%100==0 and iteration>200:   
+            figure(0)
+            plot(np.array(outputs)-np.array(pred),label=iteration)
+            legend(loc='upper left')
+            
+
     '''
     f1=open(dir+'\\w.txt','wb')
     f2=open(dir+'\\wb.txt','wb')
