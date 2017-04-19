@@ -3,7 +3,7 @@ from __future__ import division
 import numpy as np
 import pickle
 from matplotlib.pyplot import *
-dir='C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170330\\1'
+from constant import *
 def read_data():
     input=open('filter_cor.pkl','rb')
     pack=pickle.load(input)
@@ -53,5 +53,5 @@ if True:
     savefig(dir+'\\result.png',dpi=200)
     
 
-output=open('1day_matrix.pkl','wb')
+output=open('train.pkl','wb')
 pickle.dump(pack,output)
