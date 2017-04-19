@@ -7,3 +7,5 @@
 /1day_matrix
 *.txt
 /raw_data
+/data.xls
+*.pyc

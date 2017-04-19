@@ -6,22 +6,21 @@ import pickle
 from copy import copy
 from pandas import DataFrame,Series
 from matplotlib.pyplot import *
-index=['open','close','high','low','volume','v_ma20','alpha#6','alpha#23','alpha#28','alpha#54','alpha#101']
-lag=25
-dir='C:\\Projects\\FuzzyNeuro\\FuzzyNeuro\\20170330\\1'
+from constant import *
+
 def cal_cor():
     cor=list()
     df=DataFrame()
     input= open('raw_data.pkl', 'rb')
     df=pickle.load(input)   
     data=np.matrix(df,dtype=np.float64)
-    data=(data.T)[1:,:-1]
-    rate=np.matrix(df['ReturnRate'][1:],dtype=np.float64)
+    data=(data.T)[1:,:-1] 
+    rate=np.matrix(df['open'][1:],dtype=np.float64)
     #filter cor
     a=[]
     for i in xrange(data.shape[0]):
         cor.append(np.corrcoef(rate,data[i])[0][1])
-        if abs(cor[i])<0.034:
+        if abs(cor[i])<0.0423:
             a.append(i)
             print 'del:'+index[i]+':'+str(cor[i])
         else:
@@ -65,7 +64,7 @@ def get_data():
     df=df.sort_index()    
     date=df['date']
     df=df[index[:5]]
-    df['low'][1510]=3932.870 #接口包中数据错误
+    df['low'][1510]=3932.870 #接口中数据错误
 
     #ReturnRate=ln(s(t）/s(t-1))  lag=1
     df.insert(0,'ReturnRate',df['close'])   
