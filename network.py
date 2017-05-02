@@ -11,12 +11,6 @@ from constant import *
 theano.config.compute_test_value = 'warn'
 #from theano.printing import Print
 import random
-from os.path import exists
-from os import mkdir
-
-if not exists(dir):
-    mkdir(dir)
-
 class network:
     train_=0
     predict_=0 

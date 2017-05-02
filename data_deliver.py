@@ -20,7 +20,7 @@ def cal_cor():
     a=[]
     for i in xrange(data.shape[0]):
         cor.append(np.corrcoef(rate,data[i])[0][1])
-        if abs(cor[i])<0.0423:
+        if abs(cor[i])<0:
             a.append(i)
             print 'del:'+index[i]+':'+str(cor[i])
         else:
