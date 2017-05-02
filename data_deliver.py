@@ -60,7 +60,7 @@ def cal_cor():
 
 def get_data():
     df=DataFrame()
-    df=(ts.get_k_data('000300',index=True,start='2009-01-01',end='2017-01-01',ktype='D'))[['date']+index[:5]]
+    df=(ts.get_k_data('000300',index=True,start='2009-01-01',end='2017-05-01',ktype='D'))[['date']+index[:5]]
     df=df.sort_index()    
     date=df['date']
     df=df[index[:5]]

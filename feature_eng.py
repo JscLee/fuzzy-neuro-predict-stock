@@ -52,6 +52,15 @@ if True:
     plot(pack['result'],label='result')
     savefig(dir+'\\result.png',dpi=200)
     
-
+temp={}
 output=open('train.pkl','wb')
-pickle.dump(pack,output)
+temp['index']=pack['index']
+temp['result']=pack['result'][:-100]
+temp['data']=pack['data'][:-100]
+pickle.dump(temp,output)
+
+output=open('test.pkl','wb')
+temp['index']=pack['index']
+temp['result']=pack['result'][-100:]
+temp['data']=pack['data'][-100:]
+pickle.dump(temp,output)
